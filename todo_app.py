@@ -2,42 +2,24 @@
 from cgitb import text
 from tkinter import *
 from tkinter import ttk
-from tkinter import messagebox
-import random
 from turtle import bgcolor
-
-
-##############  FUNCTIONS AND SETUP ###############
-
-# Create the adding action function
-def add_action():
-    task = task_entry.get()
-    if task != "":
-        list_box.insert('end', task)
-        task_entry.delete(0, "end")
-    else:
-        messagebox.showwarning("warning", "Please enter some task.")
-    message = random.choice(add_messages)
-    message_text.set(message)
-
-# Create the removing action function
-def remove_action():
-    list_box.delete('anchor')
-    message = random.choice(remove_messages)
-    message_text.set(message)
-
-# Set up Lists
-add_messages = ["Well done!", "You're very energitic!", "Awesome! It will feel great when you reach your goal"]
-remove_messages = ["Good job!", "You're doing well", "You're being productive!"]
+import customtkinter
+from functions import *
 
 ##################  GUI CODE  ######################
-root = Tk()
+customtkinter.set_appearance_mode("dark")  # Modes: "System" (standard), "Dark", "Light"
+customtkinter.set_default_color_theme("blue")  # Themes: "blue" (standard), "green", "dark-blue"
+
+root = customtkinter.CTk()
 root.title("NOTE")
-root.config(bg='#0D2570')
+# root.config(bg='#0D2570')
 root.resizable(width=False, height=False)
 
 # Create the top frame
-top_frame = LabelFrame(root, text="WHAT TO DO", bg='#fff', border=0)
+top_frame = customtkinter.CTkFrame(master=root,
+                                width=200,
+                                height=200,
+                                corner_radius=10)
 top_frame.grid(row=0, column=0, padx=10, pady=10, sticky="NSEW")
 
 # Create and set the intro text variable
@@ -45,11 +27,16 @@ intro_text = StringVar()
 intro_text.set("Welcome! Let's be productive and see your progress.")
 
 # Create and pack the message label
-intro_label = Label(top_frame, textvariable=intro_text, wraplength=250, justify='center', bg='#fff')
+intro_label = customtkinter.CTkLabel(master=top_frame, 
+                                textvariable=intro_text, 
+                                width=120,
+                                height=50,
+                                fg_color=("#6B4101", "#EEAC4A"),
+                                corner_radius=8)
 intro_label.grid(row=0, column=0, columnspan=2, padx=10, pady=10)
 
 # Create the PhotoImage and label to hold it
-neutral_image = PhotoImage(file="~/Desktop/doit.png")
+neutral_image = PhotoImage(file="doit.png")
 
 # Create and set the message text variable
 
@@ -60,32 +47,58 @@ message_text = StringVar()
 message_text.set("Think of things to do!")
 
 # Create and pack the message label
-message_label = ttk.Label(top_frame, textvariable=message_text, wraplength=250, justify='center')
+message_label = customtkinter.CTkLabel(master=top_frame, 
+                                textvariable=message_text,  
+                                width=120,
+                                height=25,
+                                fg_color=("#6B4101", "#EEAC4A"),
+                                corner_radius=8)
 message_label.grid(row=2, column=0, columnspan=2, padx=10, pady=18)
 
 
 # Create the bottom frame
-bottom_frame = LabelFrame(root, bg='#999090')
+bottom_frame = customtkinter.CTkFrame(master=root,
+                                        width=200,
+                                        height=100,
+                                        corner_radius=10)
 bottom_frame.grid(row=1, column=0, padx=10, pady=10, sticky="NSEW")
 
-# Create a label for the task field and pack it into the GUI
-task_label = Label(bottom_frame, text="NOTE:", bg='#999090')
-task_label.grid(row=5, column=0, padx=10, pady=3)
+# note_text = StringVar()
+# note_text.set("ADD NOTE: ")
 
-# Create a variable to store the task
-task = StringVar()
-task.set("")
+# # Create a label for the task field and pack it into the GUI
+# task_label = customtkinter.CTkLabel(master=bottom_frame,
+#                                textvariable=note_text,
+#                                width=100,
+#                                height=25,
+#                                fg_color=("#6B4101"),
+#                                corner_radius=8)
+# task_label.grid(row=5, column=0, padx=10, pady=3)
 
 # Create an entry to type in task
-task_entry = ttk.Entry(bottom_frame, textvariable=task)
-task_entry.grid(row=5, column=1, padx=10, pady=3, sticky="WE")
+task_entry = customtkinter.CTkEntry(master=bottom_frame,
+                               placeholder_text="ADD TASK HERE",
+                               width=250,
+                               height=40,
+                               border_width=2,
+                               corner_radius=10)
 
+task_entry.place(relx=0.5, rely=0.3, anchor=CENTER)
 # Create a submit button
-submit_button = Button(bottom_frame, text="Submit", command=add_action, border=0)
-submit_button.grid(row=6, column=0, columnspan=2, padx=10, pady=10, ipadx=10)
+submit_button = customtkinter.CTkButton(master=bottom_frame,
+                                 width=120,
+                                 height=32,
+                                 border_width=0,
+                                 corner_radius=8,
+                                 text="Submit",
+                                 command=lambda: add_action(task_entry, list_box, message_text))
+
+submit_button.place(relx=0.5, rely=0.7, anchor=CENTER)
 
 # Create the right frame
-right_frame = ttk.LabelFrame(root, text="TASKS")
+right_frame = customtkinter.CTkFrame(master=root,
+                               width=200,
+                               corner_radius=10)
 right_frame.grid(row=0, column=1, rowspan=50, padx=10, pady=10, sticky="NSEW")
 
 list_box = Listbox(
@@ -95,7 +108,7 @@ list_box = Listbox(
     bd=0,
     fg='#464646',
     highlightthickness=0,
-    selectbackground='#a6a6a6',
+    selectbackground='#6B4101',
     activestyle="none",
 )
 list_box.grid(row=0, column=1, padx=10, pady=10, sticky="NSEW")
@@ -109,13 +122,19 @@ for item in task_list:
 scroll_bar = Scrollbar(right_frame)
 scroll_bar.grid(row=0, column=2, sticky='NS')
 
-list_box.config(yscrollcommand=scroll_bar.set)
+list_box.configure(yscrollcommand=scroll_bar.set)
 scroll_bar.config(command=list_box.yview)
 
-
 # Create a remove button
-remove_button = ttk.Button(right_frame, text="Remove", command=remove_action)
-remove_button.grid(row=6, column=1, columnspan=2, padx=10, pady=10)
+remove_button = customtkinter.CTkButton(master=right_frame,
+                                 width=120,
+                                 height=32,
+                                 border_width=0,
+                                 corner_radius=8,
+                                 text="Remove",
+                                 command=lambda: remove_action(list_box, message_text))
+
+remove_button.place(relx=0.5, rely=0.92, anchor=CENTER)
 
 # Run the mainloop
 
